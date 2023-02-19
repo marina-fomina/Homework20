@@ -1,0 +1,65 @@
+postgres=# CREATE DATABASE skypro;
+CREATE DATABASE
+postgres=# \l
+                                                          Список баз данных
+    Имя    | Владелец | Кодировка |     LC_COLLATE      |      LC_CTYPE       | локаль ICU | Провайдер локали |     Права доступа
+-----------+----------+-----------+---------------------+---------------------+------------+------------------+-----------------------
+ postgres  | postgres | UTF8      | Russian_Russia.1251 | Russian_Russia.1251 |            | libc             |
+ skypro    | postgres | UTF8      | Russian_Russia.1251 | Russian_Russia.1251 |            | libc             |
+ template0 | postgres | UTF8      | Russian_Russia.1251 | Russian_Russia.1251 |            | libc             | =c/postgres          +
+           |          |           |                     |                     |            |                  | postgres=CTc/postgres
+ template1 | postgres | UTF8      | Russian_Russia.1251 | Russian_Russia.1251 |            | libc             | =c/postgres          +
+           |          |           |                     |                     |            |                  | postgres=CTc/postgres
+(4 строки)
+
+
+postgres=# \c skypro;
+Вы подключены к базе данных "skypro" как пользователь "postgres".
+skypro=# CREATE TABLE employee (
+skypro(# id BIGSERIAL NOT NULL PRIMARY KEY,
+skypro(# first_name VARCHAR(50) NOT NULL,
+skypro(# last_name VARCHAR(50) NOT NULL,
+skypro(# gender VARCHAR(6) NOT NULL,
+skypro(# age INT NOT NULL
+skypro(# );
+CREATE TABLE
+
+skypro=# INSERT INTO employee (
+skypro(# first_name, last_name, gender, age)
+skypro-# VALUES ('Алексей', 'Попов', 'male', 35);
+INSERT 0 1
+skypro=# INSERT INTO employee (
+skypro(# first_name, last_name, gender, age)
+skypro-# VALUES ('Мария', 'Соколова', 'female', 28);
+INSERT 0 1
+skypro=# INSERT INTO employee (
+skypro(# first_name, last_name, gender, age)
+skypro-# VALUES ('Николай', 'Захаров', 'male', 42);
+INSERT 0 1
+
+skypro=# SELECT * FROM employee;
+ id | first_name | last_name | gender | age
+----+------------+-----------+--------+-----
+  1 | Алексей    | Попов     | male   |  35
+  2 | Мария      | Соколова  | female |  28
+  3 | Николай    | Захаров   | male   |  42
+(3 строки)
+
+skypro=# UPDATE employee SET first_name = 'Кирилл', last_name = 'Игнатов', gender = 'male', age = 45 WHERE id = 3;
+UPDATE 1
+skypro=# SELECT * FROM employee;
+ id | first_name | last_name | gender | age
+----+------------+-----------+--------+-----
+  1 | Алексей    | Попов     | male   |  35
+  2 | Мария      | Соколова  | female |  28
+  3 | Кирилл     | Игнатов   | male   |  45
+(3 строки)
+
+skypro=# DELETE FROM employee WHERE id = 1;
+DELETE 1
+skypro=# SELECT * FROM employee;
+ id | first_name | last_name | gender | age
+----+------------+-----------+--------+-----
+  2 | Мария      | Соколова  | female |  28
+  3 | Кирилл     | Игнатов   | male   |  45
+(2 строки)
