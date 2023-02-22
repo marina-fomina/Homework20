@@ -1,3 +1,5 @@
+// ДЗ_Введение в SQL
+
 postgres=# CREATE DATABASE skypro;
 CREATE DATABASE
 postgres=# \l
@@ -62,4 +64,110 @@ skypro=# SELECT * FROM employee;
 ----+------------+-----------+--------+-----
   2 | Мария      | Соколова  | female |  28
   3 | Кирилл     | Игнатов   | male   |  45
+(2 строки)
+
+// ДЗ_Выборка данных и вложенные запросы
+// Задание 1
+
+skypro=# INSERT INTO employee (
+skypro(# first_name, last_name, gender, age)
+skypro-# VALUES ('Александр', 'Ухаров', 'male', 40);
+INSERT 0 1
+skypro=# INSERT INTO employee (
+skypro(# first_name, last_name, gender, age)
+skypro-# VALUES ('Екатерина', 'Якунина', 'female', 32);
+INSERT 0 1
+skypro=# INSERT INTO employee (
+skypro(# id, first_name, last_name, gender, age)
+skypro-# VALUES (1, 'Анна', 'Егорова', 'female', 29);
+INSERT 0 1
+
+skypro=# SELECT first_name AS Имя, last_name AS Фамилия FROM employee;
+    Имя    | Фамилия
+-----------+----------
+ Мария     | Соколова
+ Кирилл    | Игнатов
+ Александр | Ухаров
+ Екатерина | Якунина
+ Анна      | Егорова
+(5 строк)
+
+skypro=# SELECT * FROM employee WHERE age < 30 OR age > 50;
+ id | first_name | last_name | gender | age
+----+------------+-----------+--------+-----
+  2 | Мария      | Соколова  | female |  28
+  1 | Анна       | Егорова   | female |  29
+(2 строки)
+
+skypro=# SELECT * FROM employee WHERE age BETWEEN 30 AND 50;
+ id | first_name | last_name | gender | age
+----+------------+-----------+--------+-----
+  3 | Кирилл     | Игнатов   | male   |  45
+  4 | Александр  | Ухаров    | male   |  40
+  5 | Екатерина  | Якунина   | female |  32
+(3 строки)
+
+skypro=# SELECT * FROM employee ORDER BY last_name DESC;
+ id | first_name | last_name | gender | age
+----+------------+-----------+--------+-----
+  5 | Екатерина  | Якунина   | female |  32
+  4 | Александр  | Ухаров    | male   |  40
+  2 | Мария      | Соколова  | female |  28
+  3 | Кирилл     | Игнатов   | male   |  45
+  1 | Анна       | Егорова   | female |  29
+(5 строк)
+
+skypro=# SELECT * FROM employee WHERE LENGTH(first_name) > 4;
+ id | first_name | last_name | gender | age
+----+------------+-----------+--------+-----
+  2 | Мария      | Соколова  | female |  28
+  3 | Кирилл     | Игнатов   | male   |  45
+  4 | Александр  | Ухаров    | male   |  40
+  5 | Екатерина  | Якунина   | female |  32
+(4 строки)
+
+// Задание 2
+
+skypro=# UPDATE employee SET first_name = CASE id
+skypro-# WHEN 2 THEN 'Екатерина'
+skypro-# WHEN 4 THEN 'Кирилл'
+skypro-# ELSE first_name END;
+UPDATE 5
+skypro=# SELECT * FROM employee;
+ id | first_name | last_name | gender | age
+----+------------+-----------+--------+-----
+  3 | Кирилл     | Игнатов   | male   |  45
+  5 | Екатерина  | Якунина   | female |  32
+  1 | Анна       | Егорова   | female |  29
+  2 | Екатерина  | Соколова  | female |  28
+  4 | Кирилл     | Ухаров    | male   |  40
+(5 строк)
+
+skypro=# SELECT first_name AS Имя, SUM (age) AS Суммарный_возраст
+skypro-# FROM employee GROUP BY Имя;
+    Имя    | Суммарный_возраст
+-----------+-------------------
+ Анна      |                29
+ Кирилл    |                85
+ Екатерина |                60
+(3 строки)
+
+skypro=# SELECT first_name AS Имя, MIN (age) AS Минимальный_возраст
+skypro-# FROM employee GROUP BY Имя;
+    Имя    | Минимальный_возраст
+-----------+---------------------
+ Анна      |                  29
+ Кирилл    |                  40
+ Екатерина |                  28
+(3 строки)
+
+skypro=# SELECT first_name AS Имя, MAX (age) Максимальный_возраст
+skypro-# FROM employee
+skypro-# GROUP BY Имя
+skypro-# HAVING COUNT (first_name) > 1
+skypro-# ORDER BY Максимальный_возраст;
+    Имя    | Максимальный_возраст
+-----------+----------------------
+ Екатерина |                   32
+ Кирилл    |                   45
 (2 строки)
