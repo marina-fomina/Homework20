@@ -171,3 +171,130 @@ skypro-# ORDER BY Максимальный_возраст;
  Екатерина |                   32
  Кирилл    |                   45
 (2 строки)
+
+
+// ДЗ_Работа с несколькими таблицами
+// Задание 1
+
+skypro=# CREATE TABLE city (
+skypro(# city_id BIGSERIAL NOT NULL PRIMARY KEY,
+skypro(# city_name VARCHAR (50) NOT NULL);
+CREATE TABLE
+
+skypro=# ALTER TABLE employee ADD city_id INT;
+ALTER TABLE
+skypro=# SELECT * FROM employee;
+ id | first_name | last_name | gender | age | city_id
+----+------------+-----------+--------+-----+---------
+  3 | Кирилл     | Игнатов   | male   |  45 |
+  5 | Екатерина  | Якунина   | female |  32 |
+  1 | Анна       | Егорова   | female |  29 |
+  2 | Екатерина  | Соколова  | female |  28 |
+  4 | Кирилл     | Ухаров    | male   |  40 |
+(5 строк)
+
+skypro=# ALTER TABLE employee ADD FOREIGN KEY (city_id) REFERENCES city (city_id);
+ALTER TABLE
+
+skypro=# INSERT INTO city (city_name)
+skypro-# VALUES ('Пермь'), ('Владивосток'), ('Москва'), ('Иркутск'), ('Хабаровск');
+INSERT 0 5
+skypro=# SELECT * FROM city;
+ city_id |  city_name
+---------+-------------
+       1 | Пермь
+       2 | Владивосток
+       3 | Москва
+       4 | Иркутск
+       5 | Хабаровск
+(5 строк)
+
+skypro=# UPDATE employee SET city_id = CASE id
+skypro-# WHEN 1 THEN 4
+skypro-# WHEN 2 THEN 5
+skypro-# WHEN 3 THEN 1
+skypro-# WHEN 4 THEN 2
+skypro-# WHEN 5 THEN 2
+skypro-# ELSE id END;
+UPDATE 5
+skypro=# SELECT * FROM employee;
+ id | first_name | last_name | gender | age | city_id
+----+------------+-----------+--------+-----+---------
+  3 | Кирилл     | Игнатов   | male   |  45 |       1
+  5 | Екатерина  | Якунина   | female |  32 |       2
+  1 | Анна       | Егорова   | female |  29 |       4
+  2 | Екатерина  | Соколова  | female |  28 |       5
+  4 | Кирилл     | Ухаров    | male   |  40 |       2
+(5 строк)
+
+// Задание 2
+
+skypro=# SELECT first_name AS Имя, last_name AS Фамилия, city_name AS Город
+skypro-# FROM employee
+skypro-# INNER JOIN city
+skypro-# ON employee.city_id = city.city_id;
+    Имя    | Фамилия  |    Город
+-----------+----------+-------------
+ Кирилл    | Игнатов  | Пермь
+ Екатерина | Якунина  | Владивосток
+ Анна      | Егорова  | Иркутск
+ Екатерина | Соколова | Хабаровск
+ Кирилл    | Ухаров   | Владивосток
+(5 строк)
+
+skypro=# SELECT city_name AS Город, first_name AS Имя, last_name AS Фамилия
+skypro-# FROM city LEFT JOIN employee
+skypro-# ON city.city_id = employee.city_id;
+    Город    |    Имя    | Фамилия
+-------------+-----------+----------
+ Пермь       | Кирилл    | Игнатов
+ Владивосток | Екатерина | Якунина
+ Иркутск     | Анна      | Егорова
+ Хабаровск   | Екатерина | Соколова
+ Владивосток | Кирилл    | Ухаров
+ Москва      |           |
+(6 строк)
+
+skypro=# SELECT first_name AS Имя, city_name AS Город
+skypro-# FROM employee FULL JOIN city
+skypro-# ON city.city_id = employee.city_id;
+    Имя    |    Город
+-----------+-------------
+ Кирилл    | Пермь
+ Екатерина | Владивосток
+ Анна      | Иркутск
+ Екатерина | Хабаровск
+ Кирилл    | Владивосток
+           | Москва
+(6 строк)
+
+skypro=# SELECT first_name AS Имя, city_name AS Город
+skypro-# FROM employee CROSS JOIN city;
+    Имя    |    Город
+-----------+-------------
+ Кирилл    | Пермь
+ Екатерина | Пермь
+ Анна      | Пермь
+ Екатерина | Пермь
+ Кирилл    | Пермь
+ Кирилл    | Владивосток
+ Екатерина | Владивосток
+ Анна      | Владивосток
+ Екатерина | Владивосток
+ Кирилл    | Владивосток
+ Кирилл    | Москва
+ Екатерина | Москва
+ Анна      | Москва
+ Екатерина | Москва
+ Кирилл    | Москва
+ Кирилл    | Иркутск
+ Екатерина | Иркутск
+ Анна      | Иркутск
+ Екатерина | Иркутск
+ Кирилл    | Иркутск
+ Кирилл    | Хабаровск
+ Екатерина | Хабаровск
+ Анна      | Хабаровск
+ Екатерина | Хабаровск
+ Кирилл    | Хабаровск
+(25 строк)
